@@ -28,13 +28,7 @@ public class DatabaseManager {
         entityManagerFactory.close();
     }
 
-    public void createClient(String firstName, String lastName, int age, String companyName) {
-        AbstractClientModel client;
-        if (companyName == null) {
-            client = new IndividualClientModel(firstName, lastName, age);
-        } else {
-            client = new BusinessClientModel(firstName, lastName, companyName);
-        }
+    public <T extends AbstractClientModel> void createClient(T client) {
         entityManager.getTransaction().begin();
         entityManager.persist(client);
         entityManager.getTransaction().commit();

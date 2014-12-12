@@ -14,7 +14,7 @@ import javax.persistence.Persistence;
  * @author AdministratorJa
  */
 public class DatabaseManager {
-    
+
     EntityManagerFactory entityManagerFactory;
     EntityManager entityManager;
 
@@ -22,12 +22,12 @@ public class DatabaseManager {
         entityManagerFactory = Persistence.createEntityManagerFactory("ClientDatabase");
         entityManager = entityManagerFactory.createEntityManager();
     }
-    
-    public void close(){
+
+    public void close() {
         entityManager.close();
         entityManagerFactory.close();
     }
-    
+
     public void createClient(String firstName, String lastName, int age, String companyName) {
         AbstractClientModel client;
         if (companyName == null) {
@@ -39,6 +39,12 @@ public class DatabaseManager {
         entityManager.persist(client);
         entityManager.getTransaction().commit();
     }
-    
-    
+
+    public < T extends AbstractClientModel> T getClientByIndex(long index) {
+        entityManager.getTransaction().begin();
+        T client = (T) entityManager.find(AbstractClientModel.class, index);
+        entityManager.getTransaction().commit();
+        return client;
+    }
+
 }

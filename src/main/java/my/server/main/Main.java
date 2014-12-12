@@ -5,6 +5,7 @@
  */
 package my.server.main;
 
+import my.server.models.BusinessClientModel;
 import my.server.models.DatabaseManager;
 
 /**
@@ -18,8 +19,13 @@ public class Main {
      */
     public static void main(String[] args) {
         DatabaseManager databaseManager = new DatabaseManager();
-        databaseManager.createClient("Filip", "Cieslik", 20, null);
-        databaseManager.createClient("Robert", "Cebula", 20, null);
+        databaseManager.createClient("Jan", "Kowalski", 34, null);
+        databaseManager.createClient("Ania", "Kowalska", 30, null);
+        databaseManager.createClient("Jan", "Kowalski", 0, "Microsoft");
+        BusinessClientModel client = databaseManager.getClientByIndex(3L);
+        System.out.println("Imie: " + client.getFirstName());
+        System.out.println("Nazwisko: " + client.getLastName());
+        System.out.println("Wiek: " + client.getCompanyName());
         databaseManager.close();
     }
 

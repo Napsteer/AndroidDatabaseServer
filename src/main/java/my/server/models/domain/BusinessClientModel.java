@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package my.server.models;
+package my.server.models.domain;
 
 import javax.persistence.Entity;
 

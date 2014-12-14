@@ -5,9 +5,9 @@
  */
 package my.server.main;
 
-import my.server.models.BusinessClientModel;
+import my.server.models.domain.BusinessClientModel;
 import my.server.models.DatabaseManager;
-import my.server.models.IndividualClientModel;
+import my.server.models.domain.IndividualClientModel;
 
 /**
  *

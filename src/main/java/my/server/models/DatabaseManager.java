@@ -5,6 +5,8 @@
  */
 package my.server.models;
 
+import java.util.ArrayList;
+import java.util.List;
 import my.server.models.domain.AbstractClientModel;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -15,31 +17,33 @@ import javax.persistence.Persistence;
  * @author AdministratorJa
  */
 public class DatabaseManager {
-
+    
     EntityManagerFactory entityManagerFactory;
     EntityManager entityManager;
-
+    
     public DatabaseManager() {
         entityManagerFactory = Persistence.createEntityManagerFactory("ClientDatabase");
         entityManager = entityManagerFactory.createEntityManager();
     }
-
+    
     public void close() {
         entityManager.close();
         entityManagerFactory.close();
     }
-
+    
     public <T extends AbstractClientModel> void createClient(T client) {
         entityManager.getTransaction().begin();
         entityManager.persist(client);
         entityManager.getTransaction().commit();
     }
-
-    public < T extends AbstractClientModel> T getClientByIndex(long index) {
+    
+    public List<AbstractClientModel> getClientByIndex(long index) {
         entityManager.getTransaction().begin();
-        T client = (T) entityManager.find(AbstractClientModel.class, index);
+        AbstractClientModel client = (AbstractClientModel) entityManager.find(AbstractClientModel.class, index);
         entityManager.getTransaction().commit();
-        return client;
+        List<AbstractClientModel> clients = new ArrayList<>();
+        clients.add(client);
+        return clients;
     }
-
+    
 }

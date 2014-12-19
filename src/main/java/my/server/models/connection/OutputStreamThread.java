@@ -8,10 +8,13 @@ package my.server.models.connection;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
 import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import my.server.models.domain.AbstractClientModel;
+import my.server.models.message.DataMessage;
 
 /**
  *
@@ -31,9 +34,10 @@ public class OutputStreamThread extends Observable {
         }
     }
 
-    protected void sendObject(Object output) {
+    protected void send(List<AbstractClientModel> clients) {
+        DataMessage message = new DataMessage(clients);
         try {
-            objectOutputStream.writeObject(output);
+            objectOutputStream.writeObject(message);
             objectOutputStream.flush();
             objectOutputStream.reset();
         } catch (IOException ex) {

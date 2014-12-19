@@ -12,6 +12,7 @@ import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import my.server.models.message.Message;
 
 /**
  *
@@ -23,12 +24,12 @@ public class InputStreamThread extends Observable implements Runnable {
     private Object input;
     private boolean active;
 
-    public Object getInput() {
-        return input;
+    public Message getInput() {
+        return (Message) input;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void shutdown() {
+        this.active = false;
     }
 
     protected InputStreamThread(Socket socket) {

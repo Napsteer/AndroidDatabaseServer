@@ -5,8 +5,6 @@
  */
 package my.server.views;
 
-import javax.swing.text.BadLocationException;
-
 /**
  *
  * @author AdministratorJa
@@ -82,7 +80,7 @@ public class MainView extends javax.swing.JFrame {
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
     public void logMessage(String message) {
-        logTextArea.setText(message);
+        logTextArea.append(message + "\n");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

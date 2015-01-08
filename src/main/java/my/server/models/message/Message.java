@@ -5,16 +5,29 @@
  */
 package my.server.models.message;
 
+import java.util.List;
+import my.server.models.domain.AbstractClientModel;
+
 /**
- *
- * @author AdministratorJa
+ * Wrapper class for data sent through socket.
+ * 
  */
-public interface Message {
 
-    public static final String TYPE_SYSTEM = "system";
-    public static final String TYPE_DATA = "data";
-    public static final String TYPE_QUERY = "query";
-    public static final String SYSTEM_CLOSE_SOCKET = "close";
+public class Message {
 
-    public String getType();
+    private final MessageCode messageCode;
+    private final List<AbstractClientModel> clients;
+
+    public Message(MessageCode messageCode, List<AbstractClientModel> clients) {
+        this.messageCode = messageCode;
+        this.clients = clients;
+    }
+
+    public MessageCode getMessageCode() {
+        return messageCode;
+    }
+
+    public List<AbstractClientModel> getClients() {
+        return clients;
+    }
 }

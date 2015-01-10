@@ -6,6 +6,7 @@
 package my.server.controllers;
 
 import java.util.List;
+import java.util.Map;
 import my.server.models.connection.Server;
 import my.server.models.domain.AbstractClientModel;
 import my.server.models.domain.DatabaseManager;
@@ -27,26 +28,22 @@ public class MainController {
         this.mainView = mainView;
         init();
     }
-    
-    private void init(){
+
+    private void init() {
         mainView.setVisible(true);
         server.setController(this);
         server.setUpConnection();
-    }
-
-    public void executeQuery(String query) {
-        databaseManager.executeQuery(query);
     }
 
     public void log(String message) {
         mainView.logMessage(message);
     }
 
-    public void sendMessage(List<AbstractClientModel> clients) {
-        server.send(clients);
+    public boolean addClient(AbstractClientModel client) {
+        return databaseManager.createClient(client);
     }
-    
-    public void addClients(List<AbstractClientModel> clients){
-        // TODO dokonczyc
+
+    public List<AbstractClientModel> findClients(Map<String, Object> criteria) {
+        return databaseManager.findClients(criteria);
     }
 }

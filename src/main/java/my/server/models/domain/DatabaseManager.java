@@ -5,12 +5,16 @@
  */
 package my.server.models.domain;
 
-import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.TypedQuery;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.criterion.Restrictions;
 
 /**
  *
@@ -18,13 +22,14 @@ import javax.persistence.TypedQuery;
  */
 public class DatabaseManager {
 
-    private final EntityManagerFactory entityManagerFactory;
-    private final EntityManager entityManager;
     private static final DatabaseManager databaseManager = new DatabaseManager();
+    private final SessionFactory factory;
 
     private DatabaseManager() {
-        entityManagerFactory = Persistence.createEntityManagerFactory("ClientDatabase");
-        entityManager = entityManagerFactory.createEntityManager();
+        factory = new AnnotationConfiguration().configure()
+                .addAnnotatedClass(AbstractClientModel.class)
+                .addAnnotatedClass(IndividualClientModel.class)
+                .addAnnotatedClass(BusinessClientModel.class).buildSessionFactory();
     }
 
     public static DatabaseManager getInstance() {
@@ -32,31 +37,40 @@ public class DatabaseManager {
     }
 
     public void close() {
-        entityManager.close();
-        entityManagerFactory.close();
+        factory.close();
     }
 
-    public <T extends AbstractClientModel> void createClient(T client) {
-        entityManager.getTransaction().begin();
-        entityManager.persist(client);
-        entityManager.getTransaction().commit();
+    public boolean createClient(AbstractClientModel client) {
+        Session session = factory.getCurrentSession();
+        try {
+            session.beginTransaction();
+            session.save(client);
+            session.getTransaction().commit();
+            return true;
+        } catch (Exception ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.WARNING, "Encountered exception while saving client to database.", ex);
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
-    public List<AbstractClientModel> getClientByIndex(long index) {
-        entityManager.getTransaction().begin();
-        AbstractClientModel client = (AbstractClientModel) entityManager.find(AbstractClientModel.class, index);
-        entityManager.getTransaction().commit();
-        List<AbstractClientModel> clients = new ArrayList<>();
-        clients.add(client);
-        return clients;
-    }
-
-    public List<AbstractClientModel> executeQuery(String query) {
-        entityManager.getTransaction().begin();
-        TypedQuery<AbstractClientModel> result = entityManager.createQuery(query, AbstractClientModel.class);
-        entityManager.getTransaction().commit();
-        List<AbstractClientModel> clients = (ArrayList) result;
-        return clients;
+    public List<AbstractClientModel> findClients(Map<String, Object> criteria) {
+        Session session = factory.getCurrentSession();
+        Criteria cr;
+        try {
+            session.beginTransaction();
+            cr = session.createCriteria(AbstractClientModel.class);
+            for (Entry<String, Object> entry : criteria.entrySet()) {
+                cr.add(Restrictions.eq(entry.getKey(), entry.getValue()));
+            }
+            return cr.list();
+        } catch (Exception ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.WARNING, "Encountered exception while fetching client from database.", ex);
+            return null;
+        } finally {
+            session.close();
+        }
     }
 
 }

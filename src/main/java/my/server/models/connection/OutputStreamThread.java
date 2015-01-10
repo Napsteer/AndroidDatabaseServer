@@ -9,12 +9,14 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import my.server.models.domain.AbstractClientModel;
-import my.server.models.message.DataMessage;
+import my.server.models.message.Message;
+import my.server.models.message.MessageCode;
 
 /**
  *
@@ -29,13 +31,13 @@ public class OutputStreamThread extends Observable {
             this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException ex) {
             Logger.getLogger(InputStreamThread.class.getName()).log(Level.SEVERE, "IO error while opening output stream!", ex);
-            JOptionPane.showMessageDialog(null, "Wystąpił błąd w trakcie otwierania strumienia wyjßciowego.");
+            JOptionPane.showMessageDialog(null, "Wystąpił błąd w trakcie otwierania strumienia wyjsciowego.");
             System.exit(30);
         }
     }
 
-    protected void send(List<AbstractClientModel> clients) {
-        DataMessage message = new DataMessage(clients);
+    protected void send(MessageCode messageCode, List<AbstractClientModel> clients, Map<String, Object> criteria) {
+        Message message = new Message(messageCode,clients, criteria);
         try {
             objectOutputStream.writeObject(message);
             objectOutputStream.flush();

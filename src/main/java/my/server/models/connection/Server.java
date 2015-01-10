@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.logging.Level;
@@ -16,10 +17,8 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import my.server.controllers.MainController;
 import my.server.models.domain.AbstractClientModel;
-import my.server.models.message.DataMessage;
 import my.server.models.message.Message;
-import my.server.models.message.QueryMessage;
-import my.server.models.message.SystemMessage;
+import my.server.models.message.MessageCode;
 
 /**
  *
@@ -27,8 +26,6 @@ import my.server.models.message.SystemMessage;
  */
 public class Server implements Observer {
 
-    // TODO dodac loggowanie poszczegolnych krokow otwierania polaczenia
-    // TODO dodac sendMessage
     private final int portNumber = 5124;
     private ServerSocket serverSocket;
     private Socket socket;
@@ -36,10 +33,10 @@ public class Server implements Observer {
     private OutputStreamThread outputStreamThread;
     private MainController controller;
 
-    public void setController(MainController controller){
+    public void setController(MainController controller) {
         this.controller = controller;
     }
-    
+
     private void setUpServer() {
         try {
             serverSocket = new ServerSocket(portNumber);
@@ -49,6 +46,7 @@ public class Server implements Observer {
             System.exit(10);
         }
         controller.log("Server socket has been set up.");
+        Logger.getLogger(Server.class.getName()).log(Level.INFO, "Server socket has been set up.");
     }
 
     private void waitForClient() {
@@ -61,6 +59,7 @@ public class Server implements Observer {
             System.exit(11);
         }
         controller.log("Client connected.");
+        Logger.getLogger(Server.class.getName()).log(Level.INFO, "Client connected.");
     }
 
     private void openStreams() {
@@ -69,50 +68,62 @@ public class Server implements Observer {
         inputStreamThread.addObserver(this);
         new Thread(inputStreamThread).start();
         controller.log("Opened streams.");
+        Logger.getLogger(Server.class.getName()).log(Level.INFO, "Opened streams.");
     }
 
     private void clearSocket() {
+        try {
+            socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, "IO error while closing socket.", ex);
+            JOptionPane.showMessageDialog(null, "Wystąpił błąd w trakcie zamykania połączenia.");
+            System.exit(12);
+        }
         socket = null;
         inputStreamThread.shutdown();
         inputStreamThread = null;
         outputStreamThread = null;
         controller.log("Connection cleared.");
+        Logger.getLogger(Server.class.getName()).log(Level.INFO, "Connection cleared.");
     }
 
     public void setUpConnection() {
-        setUpServer();
+        if (serverSocket == null) {
+            setUpServer();
+        }
         waitForClient();
         openStreams();
         controller.log("Initialization complete.");
+        Logger.getLogger(Server.class.getName()).log(Level.INFO, "Initialization complete.");
     }
 
     @Override
     public void update(Observable observable, Object object) {
-        String messageType = inputStreamThread.getInput().getType();
-        if (messageType.equals(Message.TYPE_DATA)) {
-            DataMessage message = (DataMessage) inputStreamThread.getInput();
-            controller.addClients(message.getClients());
+        Message message = (Message) inputStreamThread.getInput();
+        switch (message.getMessageCode()) {
+            case ADD_CLIENT:
+                if (controller.addClient(message.getClients().get(0))) {
+                    outputStreamThread.send(MessageCode.OK, null, null);
+                } else {
+                    outputStreamThread.send(MessageCode.ERROR, null, null);
+                }
+                break;
+            case FIND_CLIENTS:
+                Map<String, Object> criteria = message.getCriteria();
+                List<AbstractClientModel> clients = controller.findClients(criteria);
+                if (clients != null) {
+                    if (!clients.isEmpty()) {
+                        outputStreamThread.send(MessageCode.OK, clients, null);
+                    } else {
+                        outputStreamThread.send(MessageCode.NO_ENTRIES_FOUND, null, null);
+                    }
+                } else {
+                    outputStreamThread.send(MessageCode.ERROR, null, null);
+                }
+                break;
         }
-        if (messageType.equals(Message.TYPE_SYSTEM)) {
-            SystemMessage message = (SystemMessage) inputStreamThread.getInput();
-            switch (((SystemMessage) message).getMessage()) {
-                case DataMessage.SYSTEM_CLOSE_SOCKET:
-                    clearSocket();
-                    controller.log("Client disconnected.");
-                    break;
-                default:
-                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, "IO error while accepting client!");
-                    JOptionPane.showMessageDialog(null, "Otrzymano wiadomość o nieznanym typie.");
-                    System.exit(12);
-            }
-        }
-        if (messageType.equals(Message.TYPE_QUERY)) {
-            QueryMessage message = (QueryMessage) inputStreamThread.getInput();
-            controller.executeQuery(message.getQuery());
-        }
+        clearSocket();
+        waitForClient();
     }
 
-    public void send(List<AbstractClientModel> clients) {
-        outputStreamThread.send(clients);
-    }
 }

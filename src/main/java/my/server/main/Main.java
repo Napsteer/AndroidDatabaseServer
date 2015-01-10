@@ -23,6 +23,7 @@ public class Main {
         DatabaseManager databaseManager =  DatabaseManager.getInstance();
         MainView mainView = new MainView();
         MainController mainController = new MainController(databaseManager, server, mainView);
+        databaseManager.close();
     }
 
 }

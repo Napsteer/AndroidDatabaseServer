@@ -18,7 +18,7 @@ public class Message {
 
     private final MessageCode messageCode;
     private final List<AbstractClientModel> clients;
-    private final Map<String, String> criteria;
+    private final Map<String, Object> criteria;
 
     /**
      *
@@ -28,7 +28,7 @@ public class Message {
      * database.
      * @see MessageCode
      */
-    public Message(MessageCode messageCode, List<AbstractClientModel> clients, Map<String, String> criteria) {
+    public Message(MessageCode messageCode, List<AbstractClientModel> clients, Map<String, Object> criteria) {
         this.messageCode = messageCode;
         this.clients = clients;
         this.criteria = criteria;
@@ -57,10 +57,10 @@ public class Message {
      * Get a map of criterias for database query. Can be null in case of some
      * message codes.
      *
-     * @return {@link Map} of {@link String} keys and values.
+     * @return {@link Map} of {@link String} keys and any values.
      * @see MessageCode
      */
-    public Map<String, String> getCriteria() {
+    public Map<String, Object> getCriteria() {
         return criteria;
     }
 }

@@ -6,36 +6,47 @@
 package my.server.models.message;
 
 /**
- * Enum containing message codes.
- * Contains both server and client side codes.
+ * Enum containing message codes. Contains both server and client side codes.
+ * Member of {@link Message} wrapper class.
+ *
+ * @see Message
  */
-
 public enum MessageCode {
 
     /**
-     * Task was completed successfully.
+     * Task was completed successfully. The criteria map of {@link Message}
+     * wrapper will be null.
+     *
+     * @see Message
      */
-    OK, 
-
+    OK,
     /**
-     * Return code used when asking for client data.
-     * No entries for given criteria were found.
+     * Return code indicating that there were no entries found for given
+     * criteria. The clients list and criteria map of {@link Message} wrapper
+     * will be null.
+     *
+     * @see Message
      */
-    NO_ENTRIES_FOUND, 
-
+    NO_ENTRIES_FOUND,
     /**
-     * Return code used when adding user to database.
-     * Indicates that client data was not saved.
+     * There was an error and request was not fulfilled. The clients list and
+     * criteria map of {@link Message} wrapper will be null.
+     *
+     * @see Message
      */
     ERROR,
-
     /**
-     * Task code used to find clients by given criteria.
+     * Task code used to find clients by given criteria. The clients list of
+     * {@link Message} wrapper will be null.
+     *
+     * @see Message
      */
-    FIND_CLIENTS, 
-
+    FIND_CLIENTS,
     /**
-     * Task code used to add client data to database.
+     * Task code used to add client data to database. The criteria map of
+     * {@link Message} wrapper will be null.
+     *
+     * @see Message
      */
-    ADD_CLIENT; // Client side
+    ADD_CLIENT;
 }

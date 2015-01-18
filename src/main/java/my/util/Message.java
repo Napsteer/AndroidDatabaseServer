@@ -3,18 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package my.server.models.message;
+package my.util;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import my.server.models.domain.AbstractClientModel;
+import my.domain.AbstractClientModel;
 
 /**
  * Wrapper class for data sent through socket. Contains message code, list of
  * clients and a map of criteria. The last two can be null in some cases.
  *
  */
-public class Message {
+public class Message implements Serializable {
 
     private final MessageCode messageCode;
     private final List<AbstractClientModel> clients;

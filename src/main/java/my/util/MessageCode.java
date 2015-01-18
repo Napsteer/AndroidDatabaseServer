@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package my.server.models.message;
+package my.util;
 
 /**
  * Enum containing message codes. Contains both server and client side codes.

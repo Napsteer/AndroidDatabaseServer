@@ -5,6 +5,9 @@
  */
 package my.server.models.domain;
 
+import my.domain.IndividualClientModel;
+import my.domain.AbstractClientModel;
+import my.domain.BusinessClientModel;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,7 +44,7 @@ public class DatabaseManager {
     }
 
     public boolean createClient(AbstractClientModel client) {
-        Session session = factory.getCurrentSession();
+        Session session = factory.openSession();
         try {
             session.beginTransaction();
             session.save(client);
@@ -56,7 +59,7 @@ public class DatabaseManager {
     }
 
     public List<AbstractClientModel> findClients(Map<String, Object> criteria) {
-        Session session = factory.getCurrentSession();
+        Session session = factory.openSession();
         Criteria cr;
         try {
             session.beginTransaction();

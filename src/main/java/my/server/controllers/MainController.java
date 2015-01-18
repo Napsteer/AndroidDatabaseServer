@@ -8,7 +8,7 @@ package my.server.controllers;
 import java.util.List;
 import java.util.Map;
 import my.server.models.connection.Server;
-import my.server.models.domain.AbstractClientModel;
+import my.domain.AbstractClientModel;
 import my.server.models.domain.DatabaseManager;
 import my.server.views.MainView;
 

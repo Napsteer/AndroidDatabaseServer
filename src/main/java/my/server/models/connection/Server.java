@@ -10,21 +10,19 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import my.server.controllers.MainController;
-import my.server.models.domain.AbstractClientModel;
-import my.server.models.message.Message;
-import my.server.models.message.MessageCode;
+import my.domain.AbstractClientModel;
+import my.util.Message;
+import my.util.MessageCode;
 
 /**
  *
  * @author AdministratorJa
  */
-public class Server implements Observer {
+public class Server {
 
     private final int portNumber = 5124;
     private ServerSocket serverSocket;
@@ -65,8 +63,6 @@ public class Server implements Observer {
     private void openStreams() {
         outputStreamThread = new OutputStreamThread(socket);
         inputStreamThread = new InputStreamThread(socket);
-        inputStreamThread.addObserver(this);
-        new Thread(inputStreamThread).start();
         controller.log("Opened streams.");
         Logger.getLogger(Server.class.getName()).log(Level.INFO, "Opened streams.");
     }
@@ -80,7 +76,6 @@ public class Server implements Observer {
             System.exit(12);
         }
         socket = null;
-        inputStreamThread.shutdown();
         inputStreamThread = null;
         outputStreamThread = null;
         controller.log("Connection cleared.");
@@ -95,15 +90,17 @@ public class Server implements Observer {
         openStreams();
         controller.log("Initialization complete.");
         Logger.getLogger(Server.class.getName()).log(Level.INFO, "Initialization complete.");
+        waitForMessage();
     }
 
-    @Override
-    public void update(Observable observable, Object object) {
-        Message message = (Message) inputStreamThread.getInput();
+    public void waitForMessage() {
+        Message message = inputStreamThread.getInput();
         switch (message.getMessageCode()) {
             case ADD_CLIENT:
                 if (controller.addClient(message.getClients().get(0))) {
                     outputStreamThread.send(MessageCode.OK, null, null);
+                    controller.log("Added client to database.");
+                    Logger.getLogger(Server.class.getName()).log(Level.INFO, "Added client to database.");
                 } else {
                     outputStreamThread.send(MessageCode.ERROR, null, null);
                 }
@@ -114,8 +111,12 @@ public class Server implements Observer {
                 if (clients != null) {
                     if (!clients.isEmpty()) {
                         outputStreamThread.send(MessageCode.OK, clients, null);
+                        controller.log("Sent clients list.");
+                        Logger.getLogger(Server.class.getName()).log(Level.INFO, "Sent clients list.");
                     } else {
                         outputStreamThread.send(MessageCode.NO_ENTRIES_FOUND, null, null);
+                        controller.log("Did not find any clients for criteria.");
+                        Logger.getLogger(Server.class.getName()).log(Level.INFO, "Did not find any clients for criteria.");
                     }
                 } else {
                     outputStreamThread.send(MessageCode.ERROR, null, null);
@@ -123,7 +124,7 @@ public class Server implements Observer {
                 break;
         }
         clearSocket();
-        waitForClient();
+        setUpConnection();
     }
 
 }

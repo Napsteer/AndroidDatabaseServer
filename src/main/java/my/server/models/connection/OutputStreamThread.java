@@ -14,9 +14,9 @@ import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import my.server.models.domain.AbstractClientModel;
-import my.server.models.message.Message;
-import my.server.models.message.MessageCode;
+import my.domain.AbstractClientModel;
+import my.util.Message;
+import my.util.MessageCode;
 
 /**
  *

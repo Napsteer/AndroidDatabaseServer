@@ -8,29 +8,18 @@ package my.server.models.connection;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
-import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import my.server.models.message.Message;
+import my.util.Message;
 
 /**
  *
  * @author AdministratorJa
  */
-public class InputStreamThread extends Observable implements Runnable {
+public class InputStreamThread {
 
     ObjectInputStream objectInputStream;
-    private Object input;
-    private boolean active;
-
-    public Message getInput() {
-        return (Message) input;
-    }
-
-    public void shutdown() {
-        this.active = false;
-    }
 
     protected InputStreamThread(Socket socket) {
         try {
@@ -40,25 +29,18 @@ public class InputStreamThread extends Observable implements Runnable {
             JOptionPane.showMessageDialog(null, "Wystąpił błąd w trakcie otwierania strumienia wejściowego.");
             System.exit(20);
         }
-        active = true;
     }
 
-    @Override
-    public void run() {
-        while (true) {
-            try {
-                input = objectInputStream.readObject();
-            } catch (IOException | ClassNotFoundException ex) {
-                Logger.getLogger(InputStreamThread.class.getName()).log(Level.SEVERE, "IO error while reading from input stream!", ex);
-                JOptionPane.showMessageDialog(null, "Połączenie zerwane. Spróbuj uruchomić aplikację ponownie.");
-                System.exit(21);
-            }
-            setChanged();
-            notifyObservers();
-            if (!active) {
-                return;
-            }
+    protected Message getInput() {
+        Message input = null;
+        try {
+            input = (Message) objectInputStream.readObject();
+        } catch (IOException | ClassNotFoundException ex) {
+            Logger.getLogger(InputStreamThread.class.getName()).log(Level.SEVERE, "IO error while reading from input stream!", ex);
+            JOptionPane.showMessageDialog(null, "Połączenie zerwane. Spróbuj uruchomić aplikację ponownie.");
+            System.exit(21);
         }
+        return input;
     }
 
 }

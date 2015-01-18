@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package my.server.models.domain;
+package my.domain;
 
 import javax.persistence.Entity;
 
@@ -30,5 +30,10 @@ public class IndividualClientModel extends AbstractClientModel {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " klient indywidualny";
     }
 }

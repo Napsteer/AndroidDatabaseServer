@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package my.server.models.domain;
+package my.domain;
 
 import java.io.Serializable;
 import javax.persistence.Entity;
@@ -56,6 +56,11 @@ public abstract class AbstractClientModel implements Serializable {
     public AbstractClientModel(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
+    }
+
+    @Override
+    public String toString() {
+        return firstName + " " + lastName;
     }
 
 }
